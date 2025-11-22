@@ -8,6 +8,20 @@ import { Platform } from 'react-native';
 const tintColorLight = '#0a7ea4';
 const tintColorDark = '#fff';
 
+export interface FoodItem {
+  id?: string;
+  name: string;
+  calories: number;
+  protein: number;
+  fat: number;
+  carbohydrates: number;
+  sugar?: number;
+}
+
+export interface NutritionResponse {
+  items: FoodItem[];
+}
+
 export const Colors = {
   light: {
     text: '#11181C',
@@ -51,3 +65,4 @@ export const Fonts = Platform.select({
     mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
   },
 });
+export default Colors;
