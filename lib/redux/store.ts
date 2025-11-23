@@ -2,19 +2,19 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './slices/authSlice';
 import foodReducer from './slices/foodSlice';
-// import favouriteReducer from './slices/favouriteSlice';
-// import calorieReducer from './slices/calorieSlice';
-// import tipsReducer from './slices/tipsSlice';
-// import themeReducer from './slices/themeSlice';
+import favouriteReducer from './slices/favouriteSlice';
+import calorieReducer from './slices/calorieSlice';
+import tipsReducer from './slices/tipsSlice';
+import themeReducer from './slices/themeSlice';
 
 const store = configureStore({
   reducer: {
     auth: authReducer,
     foods: foodReducer,
-    // favourites: favouriteReducer,
-    // calories: calorieReducer,
-    // tips: tipsReducer,
-    // theme: themeReducer,
+    favourites: favouriteReducer,
+    calories: calorieReducer,
+    tips: tipsReducer,
+    theme: themeReducer,
   },
 });
 

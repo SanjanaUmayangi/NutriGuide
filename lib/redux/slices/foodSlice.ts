@@ -6,11 +6,13 @@ import { fetchNutrition } from "../../api/nutritionApi";
 interface FoodState {
   items: FoodItem[];
   loading: boolean;
+   searchQuery: string;
 }
 
 const initialState: FoodState = {
   items: [],
   loading: false,
+  searchQuery: '',
 };
 
 export const fetchFoods = createAsyncThunk<FoodItem[], string>(
@@ -23,7 +25,9 @@ export const fetchFoods = createAsyncThunk<FoodItem[], string>(
 const foodSlice = createSlice({
   name: "foods",
   initialState,
-  reducers: {},
+  reducers: {
+    
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchFoods.pending, (state) => { state.loading = true; })

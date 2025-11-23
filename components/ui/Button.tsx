@@ -1,11 +1,15 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, View, ViewStyle } from 'react-native';
 import Colors from '../../constants/colors';
 
 interface ButtonProps {
   title: string;
   onPress: () => void;
   variant?: 'primary' | 'secondary';
+    disabled?: boolean;
+  icon?: string;
+  style?: ViewStyle;
+  showFavouriteButton?: boolean; 
 }
 
 export default function Button({ title, onPress, variant = 'primary' }: ButtonProps) {

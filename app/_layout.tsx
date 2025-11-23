@@ -1,58 +1,149 @@
-// // app/_layout.tsx
-// import React from 'react';
-// import { Slot} from 'expo-router';
-// import { Provider } from 'react-redux';
-// import store from '../lib/redux/store';
-// import { SafeAreaProvider } from 'react-native-safe-area-context';
-// import { View } from 'react-native';
-// import { StatusBar } from 'expo-status-bar';
+// app/_layout.tsx
+// import { Slot } from "expo-router";
+// import React, { useEffect, useState } from "react";
+// import { SafeAreaProvider } from "react-native-safe-area-context";
+// import { Provider, useDispatch } from "react-redux";
+// import { loadAuth } from "../lib/redux/slices/authSlice";
+// import store from "../lib/redux/store";
+
+// function HydrateAndRender() {
+//   const dispatch = useDispatch();
+//   const [ready, setReady] = useState(false);
+
+//   useEffect(() => {
+//     // Load persisted auth then render routes
+//     (async () => {
+//       // dispatch returns a promise when using createAsyncThunk; cast to any to satisfy TS
+//       await (dispatch(loadAuth() as any) as any);
+//       setReady(true);
+//     })();
+//   }, [dispatch]);
+
+//   if (!ready) return null;
+//   return <Slot />;
+// }
 
 // export default function RootLayout() {
 //   return (
 //     <Provider store={store}>
 //       <SafeAreaProvider>
-//         <View style={{ flex: 1 }}>
-//           <StatusBar style="auto" />
-//           {/* <Stack screenOptions={{ headerShown: false }}>
-//             <Stack.Screen name="index" />
-//           </Stack> */}
-//           <Slot />
-//         </View>
+//         <HydrateAndRender />
 //       </SafeAreaProvider>
 //     </Provider>
 //   );
 // }
-// app/_layout.tsx
+
 import { Slot } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Provider, useDispatch } from "react-redux";
-import { loadAuth } from "../lib/redux/slices/authSlice";
 import store from "../lib/redux/store";
+
+// Import all load actions
+import { loadAuth } from "../lib/redux/slices/authSlice";
+import { setFavourites } from "../lib/redux/slices/favouriteSlice";
+import { setTracker, setDailyGoalFromStorage } from "../lib/redux/slices/calorieSlice";
+import { setBookmarkedTips } from "../lib/redux/slices/tipsSlice";
+import { setTheme } from "../lib/redux/slices/themeSlice";
+import { getItem } from "../lib/utils/storage";
 
 function HydrateAndRender() {
   const dispatch = useDispatch();
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    // Load persisted auth then render routes
+    // Load ALL persisted data then render routes
     (async () => {
-      // dispatch returns a promise when using createAsyncThunk; cast to any to satisfy TS
-      await (dispatch(loadAuth() as any) as any);
-      setReady(true);
+      try {
+        console.log('🔄 Loading persisted data...');
+        
+        // Load all data from storage in parallel
+        const [
+          authData,
+          favourites,
+          tracker,
+          dailyGoal,
+          bookmarkedTips,
+          theme
+        ] = await Promise.all([
+          getItem('auth'),
+          getItem('favourites'),
+          getItem('tracker'),
+          getItem('dailyGoal'),
+          getItem('bookmarkedTips'),
+          getItem('theme')
+        ]);
+
+        console.log('📦 Loaded data:', {
+          auth: !!authData,
+          favourites: favourites?.length || 0,
+          tracker: tracker?.length || 0,
+          dailyGoal: !!dailyGoal,
+          bookmarkedTips: bookmarkedTips?.length || 0,
+          theme: theme
+        });
+
+        // Dispatch all loaded data to Redux
+        if (authData) {
+          dispatch(loadAuth() as any);
+        }
+
+        if (favourites) {
+          dispatch(setFavourites(favourites));
+        }
+
+        if (tracker) {
+          dispatch(setTracker(tracker));
+        }
+
+        if (dailyGoal) {
+          dispatch(setDailyGoalFromStorage(dailyGoal));
+        }
+
+        if (bookmarkedTips) {
+          dispatch(setBookmarkedTips(bookmarkedTips));
+        }
+
+        if (theme) {
+          dispatch(setTheme(theme));
+        }
+
+        console.log('✅ All data loaded successfully');
+        
+      } catch (error) {
+        console.error('❌ Error loading persisted data:', error);
+      } finally {
+        setReady(true);
+      }
     })();
   }, [dispatch]);
 
-  if (!ready) return null;
-  return <Slot />;
+  if (!ready) {
+    return (
+      <SafeAreaProvider>
+        <div style={{ 
+          flex: 1, 
+          justifyContent: 'center', 
+          alignItems: 'center',
+          backgroundColor: '#F5F7F9'
+        }}>
+          <text>Loading NutriGuide+...</text>
+        </div>
+      </SafeAreaProvider>
+    );
+  }
+
+  return (
+    <SafeAreaProvider>
+      <Slot />
+    </SafeAreaProvider>
+  );
 }
 
 export default function RootLayout() {
   return (
     <Provider store={store}>
-      <SafeAreaProvider>
-        <HydrateAndRender />
-      </SafeAreaProvider>
+      <HydrateAndRender />
     </Provider>
   );
 }

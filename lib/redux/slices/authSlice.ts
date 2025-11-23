@@ -1,5 +1,5 @@
 // lib/redux/slices/authSlice.ts
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { loginApi } from '../../api/authApi';
 import { getItem, removeItem, setItem } from '../../utils/storage';
 
@@ -75,7 +75,13 @@ const slice = createSlice({
     },
     clearError(state) {
       state.error = null; // Add this reducer to clear errors
-    }
+    },
+    loadAuth: (state, action: PayloadAction<{ token: string | null; username: string | null }>) => {
+      if (action.payload?.token) {
+        state.token = action.payload.token;
+        state.username = action.payload.username;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -126,5 +132,5 @@ const slice = createSlice({
   }
 });
 
-export const { logout, setCredentials, clearError } = slice.actions;
+export const { logout, setCredentials, clearError} = slice.actions;
 export default slice.reducer;

@@ -33,10 +33,11 @@ export async function fetchNutrition(query: string): Promise<FoodItem[]> {
       }];
     } else {
       const res = await axios.get(
-        `https://api.api-ninjas.com/v1/nutrition?query=${encodeURIComponent(query)}`,
+        `https://api.calorieninjas.com/v1/nutrition?query=${query}`,
         { headers: { "X-Api-Key": API_NINJAS_KEY } }
       );
-      nutritionData = res.data;
+      nutritionData = Array.isArray(res.data.items) ? res.data.items : [];
+    
     }
 
     // 2️⃣ Get image from Pixabay
@@ -47,7 +48,8 @@ export async function fetchNutrition(query: string): Promise<FoodItem[]> {
       id: Math.random().toString(36).substring(2, 12),
       name: item.name || query,
       brand: "",
-      calories: item.calories,
+      //calories: item.calories,
+      calories: typeof item.calories === "number" ? item.calories : 23,
       sugar: typeof item.sugar_g === "number" ? item.sugar_g : 0,
       fat: typeof item.fat_total_g === "number" ? item.fat_total_g : 0,
       fat_saturated: item.fat_saturated_g,
