@@ -88,6 +88,35 @@ export default function ProductPage() {
           <Text>Fat</Text>
           <Text style={s.nutritionValue}>{food.fat}g</Text>
         </View>
+        <View style={s.nutritionRow}>
+          <Text>Serving Size</Text>
+          <Text style={s.nutritionValue}>{food.serving_size_g ?? '?'} g</Text>
+        </View>
+        <View style={s.nutritionRow}>
+          <Text>Saturated Fat</Text>
+          <Text style={s.nutritionValue}>{food.fat_saturated ?? '?'} g</Text>
+        </View>
+        <View style={s.nutritionRow}>
+          <Text>Sodium</Text>
+          <Text style={s.nutritionValue}>{food.sodium_mg ?? '?'} mg</Text>
+        </View>
+        <View style={s.nutritionRow}>
+          <Text>Potassium</Text>
+          <Text style={s.nutritionValue}>{food.potassium_mg ?? '?'} mg</Text>
+        </View>
+        <View style={s.nutritionRow}>
+          <Text>Cholesterol</Text>
+          <Text style={s.nutritionValue}>{food.cholesterol_mg ?? '?'} mg</Text>
+        </View>
+        <View style={s.nutritionRow}>
+          <Text>Fiber</Text>
+          <Text style={s.nutritionValue}>{food.fiber ?? '?'} g</Text>
+        </View>
+        <View style={s.nutritionRow}>
+          <Text>Sugar</Text>
+          <Text style={s.nutritionValue}>{food.sugar ?? '?'} g</Text>
+        </View>
+
       </View>
 
       <View style={s.actions}>

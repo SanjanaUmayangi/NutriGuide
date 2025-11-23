@@ -7,27 +7,33 @@ interface FoodCardProps {
   onPress: (item: FoodItem) => void;
 }
 
+// components/FoodCard.tsx
 export default function FoodCard({ item, onPress }: FoodCardProps) {
   return (
     <TouchableOpacity style={s.card} onPress={() => onPress(item)}>
-<Image
-  source={ item.image ? { uri: item.image } : require('../assets/images/icon.png') }
-  style={s.image}
-/>
-
+      <Image
+        source={ 
+          item.image 
+            ? { uri: item.image } 
+            : require('../assets/images/icon.png') 
+        }
+        style={s.image}
+        defaultSource={require('../assets/images/icon.png')}
+      />
       <View style={s.info}>
         <Text style={s.name}>{item.name}</Text>
-        <Text style={s.calories}>{item.calories} kcal</Text>
+        <Text style={s.calories}>
+          {item.calories > 0 ? `${item.calories} kcal` : 'Calories unknown'}
+        </Text>
         <View style={s.macros}>
-          <Text style={s.macro}>P: {item.protein}g</Text>
-          <Text style={s.macro}>C: {item.carbohydrates}g</Text>
-          <Text style={s.macro}>F: {item.fat}g</Text>
+          <Text style={s.macro}>P: {item.protein > 0 ? `${item.protein}g` : '?'}</Text>
+          <Text style={s.macro}>C: {item.carbohydrates > 0 ? `${item.carbohydrates}g` : '?'}</Text>
+          <Text style={s.macro}>F: {item.fat > 0 ? `${item.fat}g` : '?'}</Text>
         </View>
       </View>
     </TouchableOpacity>
   );
 }
-
 const s = StyleSheet.create({
   card: {
     flexDirection: 'row',

@@ -7,6 +7,12 @@ export interface FoodItem {
   fat: number;
   protein: number;
   carbohydrates: number;
+  fat_saturated?: number;
+  fiber?: number;               // new
+  serving_size_g?: number;      // new
+  sodium_mg?: number;           // new
+  potassium_mg?: number;        // new
+  cholesterol_mg?: number;
   image?: string;
 }
 

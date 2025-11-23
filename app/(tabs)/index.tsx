@@ -14,7 +14,8 @@ export default function Home() {
 
   // Fetch default foods (e.g., popular items) on first render
   useEffect(() => {
-    const defaultFoods = ['apple', 'banana', 'orange'];
+    // hooks/useNutrition.ts
+    const defaultFoods = ['apple', 'banana', 'chicken breast', 'pasta', 'yogurt', 'bread', 'cheese', 'orange'];
     defaultFoods.forEach(food => dispatch(fetchFoods(food)));
   }, []);
 
