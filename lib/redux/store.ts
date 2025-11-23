@@ -1,7 +1,7 @@
 // lib/redux/store.ts
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './slices/authSlice';
-// import foodReducer from './slices/foodSlice';
+import foodReducer from './slices/foodSlice';
 // import favouriteReducer from './slices/favouriteSlice';
 // import calorieReducer from './slices/calorieSlice';
 // import tipsReducer from './slices/tipsSlice';
@@ -10,7 +10,7 @@ import authReducer from './slices/authSlice';
 const store = configureStore({
   reducer: {
     auth: authReducer,
-    // foods: foodReducer,
+    foods: foodReducer,
     // favourites: favouriteReducer,
     // calories: calorieReducer,
     // tips: tipsReducer,
