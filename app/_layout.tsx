@@ -1,38 +1,3 @@
-// app/_layout.tsx
-// import { Slot } from "expo-router";
-// import React, { useEffect, useState } from "react";
-// import { SafeAreaProvider } from "react-native-safe-area-context";
-// import { Provider, useDispatch } from "react-redux";
-// import { loadAuth } from "../lib/redux/slices/authSlice";
-// import store from "../lib/redux/store";
-
-// function HydrateAndRender() {
-//   const dispatch = useDispatch();
-//   const [ready, setReady] = useState(false);
-
-//   useEffect(() => {
-//     // Load persisted auth then render routes
-//     (async () => {
-//       // dispatch returns a promise when using createAsyncThunk; cast to any to satisfy TS
-//       await (dispatch(loadAuth() as any) as any);
-//       setReady(true);
-//     })();
-//   }, [dispatch]);
-
-//   if (!ready) return null;
-//   return <Slot />;
-// }
-
-// export default function RootLayout() {
-//   return (
-//     <Provider store={store}>
-//       <SafeAreaProvider>
-//         <HydrateAndRender />
-//       </SafeAreaProvider>
-//     </Provider>
-//   );
-// }
-
 import { Slot } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";

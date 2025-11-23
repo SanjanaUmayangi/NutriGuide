@@ -43,6 +43,7 @@ export const loadAuth = createAsyncThunk('auth/load', async () => {
 
 // Define proper types for the state
 interface AuthState {
+  email: string | null;  
   token: string | null;
   username: string | null;
   loading: boolean;
@@ -51,6 +52,7 @@ interface AuthState {
 
 // Use the typed initialState
 const initialState: AuthState = {
+  email:'',  
   token: null,
   username: null,
   loading: false,

@@ -1,21 +1,16 @@
-import { useEffect, useState } from 'react';
-import { useColorScheme as useRNColorScheme } from 'react-native';
+import { useAppSelector } from '../lib/redux/hooks';
+import lightTheme from '../lib/themes/light';
+import darkTheme from '../lib/themes/dark';
 
-/**
- * To support static rendering, this value needs to be re-calculated on the client side for web
- */
-export function useColorScheme() {
-  const [hasHydrated, setHasHydrated] = useState(false);
-
-  useEffect(() => {
-    setHasHydrated(true);
-  }, []);
-
-  const colorScheme = useRNColorScheme();
-
-  if (hasHydrated) {
-    return colorScheme;
-  }
-
-  return 'light';
+export default function useTheme() {
+  const { current: themeName } = useAppSelector(state => state.theme);
+  
+  const theme = themeName === 'dark' ? darkTheme : lightTheme;
+  const isDark = themeName === 'dark';
+  
+  return {
+    theme,
+    isDark,
+    themeName,
+  };
 }
