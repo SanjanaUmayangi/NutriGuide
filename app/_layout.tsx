@@ -1,16 +1,28 @@
 import { Slot } from "expo-router";
 import React, { useEffect, useState } from "react";
+import { Text, View } from 'react-native';
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Provider, useDispatch } from "react-redux";
 import store from "../lib/redux/store";
-
 // Import all load actions
+import useTheme from "../hooks/useTheme";
 import { loadAuth } from "../lib/redux/slices/authSlice";
+import { setDailyGoalFromStorage, setTracker } from "../lib/redux/slices/calorieSlice";
 import { setFavourites } from "../lib/redux/slices/favouriteSlice";
-import { setTracker, setDailyGoalFromStorage } from "../lib/redux/slices/calorieSlice";
-import { setBookmarkedTips } from "../lib/redux/slices/tipsSlice";
 import { setTheme } from "../lib/redux/slices/themeSlice";
+import { setBookmarkedTips } from "../lib/redux/slices/tipsSlice";
 import { getItem } from "../lib/utils/storage";
+
+function ThemeWrapper({ children }: { children: React.ReactNode }) {
+  const { theme } = useTheme(); // 🆕 Get current theme
+  
+  return (
+    <SafeAreaProvider style={{ backgroundColor: theme.background }}>
+      {children}
+    </SafeAreaProvider>
+  );
+}
+
 
 function HydrateAndRender() {
   const dispatch = useDispatch();
@@ -86,22 +98,22 @@ function HydrateAndRender() {
   if (!ready) {
     return (
       <SafeAreaProvider>
-        <div style={{ 
+        <View style={{ 
           flex: 1, 
           justifyContent: 'center', 
           alignItems: 'center',
           backgroundColor: '#F5F7F9'
         }}>
-          <text>Loading NutriGuide+...</text>
-        </div>
+          <Text>Loading NutriGuide+...</Text>
+        </View>
       </SafeAreaProvider>
     );
   }
 
   return (
-    <SafeAreaProvider>
+    <ThemeWrapper>
       <Slot />
-    </SafeAreaProvider>
+    </ThemeWrapper>
   );
 }
 

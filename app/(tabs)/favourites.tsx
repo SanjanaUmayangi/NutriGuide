@@ -5,7 +5,6 @@ import {
   FlatList, 
   StyleSheet, 
   TouchableOpacity, 
-  Animated,
   Alert 
 } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
@@ -13,11 +12,13 @@ import { removeFavourite, clearFavourites } from '../../lib/redux/slices/favouri
 import FoodCard from '../../components/FoodCard';
 import { useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
+import useTheme from '../../hooks/useTheme'; // 🆕 Import theme hook
 
 export default function Favourites() {
   const favourites = useSelector((state: any) => state.favourites.items);
   const dispatch = useDispatch();
   const router = useRouter();
+  const { theme } = useTheme(); // 🆕 Get theme
 
   const handleRemoveFavourite = (item: any) => {
     dispatch(removeFavourite(item.name));
@@ -41,40 +42,43 @@ export default function Favourites() {
   };
 
   const EmptyState = () => (
-    <View style={styles.emptyContainer}>
-      <View style={styles.emptyIcon}>
-        <Feather name="heart" size={64} color="#E0E0E0" />
+    <View style={[styles.emptyContainer, { backgroundColor: theme.background }]}>
+      <View style={[styles.emptyIcon, { backgroundColor: theme.surface }]}>
+        <Feather name="heart" size={64} color={theme.textSecondary} />
       </View>
-      <Text style={styles.emptyTitle}>No Favourites Yet</Text>
-      <Text style={styles.emptyText}>
+      <Text style={[styles.emptyTitle, { color: theme.text }]}>No Favourites Yet</Text>
+      <Text style={[styles.emptyText, { color: theme.textSecondary }]}>
         Foods you add to favourites will appear here for quick access.
       </Text>
       <TouchableOpacity 
-        style={styles.browseButton}
+        style={[styles.browseButton, { backgroundColor: theme.primary }]}
         onPress={() => router.push('/(tabs)')}
       >
-        <Text style={styles.browseButtonText}>Browse Foods</Text>
+        <Text style={[styles.browseButtonText, { color: theme.textInverse }]}>Browse Foods</Text>
       </TouchableOpacity>
     </View>
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       {/* Header */}
       <View style={styles.header}>
         <View>
-          <Text style={styles.title}>My Favourites</Text>
-          <Text style={styles.subtitle}>
+          <Text style={[styles.title, { color: theme.text }]}>My Favourites</Text>
+          <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
             {favourites.length} saved item{favourites.length !== 1 ? 's' : ''}
           </Text>
         </View>
         {favourites.length > 0 && (
           <TouchableOpacity 
-            style={styles.clearButton}
+            style={[styles.clearButton, { 
+              backgroundColor: theme.error + '20', 
+              borderColor: theme.error + '40' 
+            }]}
             onPress={handleClearAll}
           >
-            <Feather name="trash-2" size={20} color="#FF6B6B" />
-            <Text style={styles.clearButtonText}>Clear All</Text>
+            <Feather name="trash-2" size={20} color={theme.error} />
+            <Text style={[styles.clearButtonText, { color: theme.error }]}>Clear All</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -84,13 +88,11 @@ export default function Favourites() {
         data={favourites}
         keyExtractor={(item, index) => `${item.name}-${index}`}
         renderItem={({ item, index }) => (
-
-            <FoodCard 
-              item={item} 
-              onPress={() => router.push(`/product/${encodeURIComponent(item.name)}`)} 
-              showFavouriteButton={false}
-            />
-
+          <FoodCard 
+            item={item} 
+            onPress={() => router.push(`/product/${encodeURIComponent(item.name)}`)} 
+            showFavouriteButton={false}
+          />
         )}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={favourites.length === 0 && styles.emptyListContent}
@@ -105,7 +107,6 @@ const styles = StyleSheet.create({
   container: { 
     flex: 1, 
     padding: 20,
-    backgroundColor: '#F8FAFC',
   },
   header: {
     flexDirection: 'row',
@@ -116,55 +117,21 @@ const styles = StyleSheet.create({
   title: { 
     fontSize: 32, 
     fontWeight: '800', 
-    color: '#1A1A1A',
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
     fontWeight: '500',
   },
   clearButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFF5F5',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#FED7D7',
   },
   clearButtonText: {
-    color: '#FF6B6B',
-    fontWeight: '600',
-    fontSize: 14,
-    marginLeft: 4,
-  },
-  cardContainer: { 
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    marginBottom: 12,
-    padding: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  removeButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFF5F5',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-    marginLeft: 8,
-    marginRight: 8,
-  },
-  removeButtonText: {
-    color: '#FF6B6B',
     fontWeight: '600',
     fontSize: 14,
     marginLeft: 4,
@@ -185,7 +152,6 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: '#F7FAFC',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 24,
@@ -193,20 +159,17 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#4A5568',
     marginBottom: 12,
     textAlign: 'center',
   },
   emptyText: {
     fontSize: 16,
-    color: '#718096',
     textAlign: 'center',
     lineHeight: 24,
     marginBottom: 32,
     paddingHorizontal: 20,
   },
   browseButton: {
-    backgroundColor: '#4CAF50',
     paddingHorizontal: 32,
     paddingVertical: 16,
     borderRadius: 12,
@@ -217,7 +180,6 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   browseButtonText: {
-    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '700',
   },

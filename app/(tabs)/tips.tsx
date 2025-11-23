@@ -17,11 +17,12 @@ import {
   setSelectedCategory,
   setSearchQuery,
   clearSearch,
-  fetchBookmarkedTips, // Add this import
+  fetchBookmarkedTips,
 } from '../../lib/redux/slices/tipsSlice';
 import { Feather } from '@expo/vector-icons';
 import TipCard from '../../components/TipCard';
 import { Tip } from '../../types/api';
+import useTheme from '../../hooks/useTheme'; // 🆕 Import theme hook
 
 export default function Tips() {
   const dispatch = useAppDispatch();
@@ -34,8 +35,8 @@ export default function Tips() {
     error,
     bookmarkedTips,
   } = useAppSelector(state => state.tips);
-
   const [localSearch, setLocalSearch] = useState(searchQuery);
+  const { theme } = useTheme(); // 🆕 Get theme
 
   // Enhanced categories including "Saved"
   const enhancedCategories = ['All', 'Saved', ...categories.filter(cat => cat !== 'All')];
@@ -53,7 +54,6 @@ export default function Tips() {
     if (category === 'All') {
       dispatch(fetchTips());
     } else if (category === 'Saved') {
-      // Show only bookmarked tips
       dispatch(fetchBookmarkedTips());
     } else {
       dispatch(fetchTips(category));
@@ -68,7 +68,6 @@ export default function Tips() {
     if (text.trim()) {
       dispatch(searchTips(text));
     } else {
-      // When clearing search, go back to current category
       if (selectedCategory === 'All') {
         dispatch(fetchTips());
       } else if (selectedCategory === 'Saved') {
@@ -110,8 +109,9 @@ export default function Tips() {
       key={category}
       style={[
         styles.categoryChip,
-        selectedCategory === category && styles.categoryChipActive,
-        category === 'Saved' && styles.savedCategoryChip,
+        { backgroundColor: theme.surface },
+        selectedCategory === category && [styles.categoryChipActive, { backgroundColor: theme.primary }],
+        category === 'Saved' && { borderColor: theme.primary },
       ]}
       onPress={() => handleCategoryChange(category)}
     >
@@ -119,14 +119,15 @@ export default function Tips() {
         <Feather 
           name="bookmark" 
           size={12} 
-          color={selectedCategory === 'Saved' ? '#fff' : '#4CAF50'} 
+          color={selectedCategory === 'Saved' ? theme.textInverse : theme.primary} 
           style={styles.savedIcon}
         />
       )}
       <Text
         style={[
           styles.categoryChipText,
-          selectedCategory === category && styles.categoryChipTextActive,
+          { color: theme.textSecondary },
+          selectedCategory === category && [styles.categoryChipTextActive, { color: theme.textInverse }],
         ]}
       >
         {category}
@@ -145,28 +146,29 @@ export default function Tips() {
     : tips;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Wellness Tips</Text>
-        <Text style={styles.subtitle}>
+        <Text style={[styles.title, { color: theme.text }]}>Wellness Tips</Text>
+        <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
           Expert advice for your health journey
         </Text>
       </View>
 
       {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <Feather name="search" size={20} color="#666" style={styles.searchIcon} />
+      <View style={[styles.searchContainer, { backgroundColor: theme.surface }]}>
+        <Feather name="search" size={20} color={theme.textSecondary} style={styles.searchIcon} />
         <TextInput
-          style={styles.searchInput}
+          style={[styles.searchInput, { color: theme.text }]}
           placeholder="Search tips..."
+          placeholderTextColor={theme.textSecondary}
           value={localSearch}
           onChangeText={handleSearch}
           returnKeyType="search"
         />
         {localSearch ? (
           <TouchableOpacity onPress={handleClearSearch}>
-            <Feather name="x" size={20} color="#666" />
+            <Feather name="x" size={20} color={theme.textSecondary} />
           </TouchableOpacity>
         ) : null}
       </View>
@@ -183,20 +185,20 @@ export default function Tips() {
       </View>
 
       {/* Stats */}
-      <View style={styles.statsContainer}>
+      <View style={[styles.statsContainer, { backgroundColor: theme.surface }]}>
         <View style={styles.statItem}>
-          <Text style={styles.statNumber}>{displayTips.length}</Text>
-          <Text style={styles.statLabel}>
+          <Text style={[styles.statNumber, { color: theme.primary }]}>{displayTips.length}</Text>
+          <Text style={[styles.statLabel, { color: theme.textSecondary }]}>
             {selectedCategory === 'Saved' ? 'Saved' : 'Tips'}
           </Text>
         </View>
         <View style={styles.statItem}>
-          <Text style={styles.statNumber}>{bookmarkedTips.length}</Text>
-          <Text style={styles.statLabel}>Saved</Text>
+          <Text style={[styles.statNumber, { color: theme.primary }]}>{bookmarkedTips.length}</Text>
+          <Text style={[styles.statLabel, { color: theme.textSecondary }]}>Saved</Text>
         </View>
         <View style={styles.statItem}>
-          <Text style={styles.statNumber}>{categories.length}</Text>
-          <Text style={styles.statLabel}>Categories</Text>
+          <Text style={[styles.statNumber, { color: theme.primary }]}>{categories.length}</Text>
+          <Text style={[styles.statLabel, { color: theme.textSecondary }]}>Categories</Text>
         </View>
       </View>
 
@@ -206,7 +208,11 @@ export default function Tips() {
         renderItem={renderTipItem}
         keyExtractor={(item) => item.id}
         refreshControl={
-          <RefreshControl refreshing={loading} onRefresh={handleRefresh} />
+          <RefreshControl 
+            refreshing={loading} 
+            onRefresh={handleRefresh}
+            colors={[theme.primary]}
+          />
         }
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
@@ -215,9 +221,9 @@ export default function Tips() {
             <Feather 
               name={selectedCategory === 'Saved' ? "bookmark" : "info"} 
               size={48} 
-              color="#CCCCCC" 
+              color={theme.textSecondary} 
             />
-            <Text style={styles.emptyTitle}>
+            <Text style={[styles.emptyTitle, { color: theme.text }]}>
               {loading 
                 ? 'Loading Tips...' 
                 : selectedCategory === 'Saved' 
@@ -225,7 +231,7 @@ export default function Tips() {
                   : 'No Tips Found'
               }
             </Text>
-            <Text style={styles.emptyText}>
+            <Text style={[styles.emptyText, { color: theme.textSecondary }]}>
               {selectedCategory === 'Saved' 
                 ? 'Bookmark tips you find helpful to see them here!'
                 : searchQuery
@@ -235,10 +241,10 @@ export default function Tips() {
             </Text>
             {selectedCategory === 'Saved' && tips.length > 0 && (
               <TouchableOpacity 
-                style={styles.browseButton}
+                style={[styles.browseButton, { backgroundColor: theme.primary }]}
                 onPress={() => handleCategoryChange('All')}
               >
-                <Text style={styles.browseButtonText}>Browse All Tips</Text>
+                <Text style={[styles.browseButtonText, { color: theme.textInverse }]}>Browse All Tips</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -247,9 +253,9 @@ export default function Tips() {
 
       {/* Error Message */}
       {error && (
-        <View style={styles.errorContainer}>
-          <Feather name="alert-triangle" size={20} color="#FF6B6B" />
-          <Text style={styles.errorText}>{error}</Text>
+        <View style={[styles.errorContainer, { backgroundColor: theme.error + '20' }]}>
+          <Feather name="alert-triangle" size={20} color={theme.error} />
+          <Text style={[styles.errorText, { color: theme.error }]}>{error}</Text>
         </View>
       )}
     </View>
@@ -260,7 +266,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#F5F7F9',
   },
   header: {
     marginBottom: 20,
@@ -268,17 +273,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#1E1E1E',
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 12,
@@ -295,7 +297,6 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 16,
-    color: '#1E1E1E',
   },
   categoriesContainer: {
     marginBottom: 16,
@@ -308,7 +309,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: '#fff',
     borderRadius: 20,
     marginRight: 8,
     shadowColor: '#000',
@@ -318,11 +318,7 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   categoryChipActive: {
-    backgroundColor: '#4CAF50',
-  },
-  savedCategoryChip: {
-    borderWidth: 1,
-    borderColor: '#4CAF50',
+    // Styles handled inline
   },
   savedIcon: {
     marginRight: 4,
@@ -330,15 +326,13 @@ const styles = StyleSheet.create({
   categoryChipText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#666',
   },
   categoryChipTextActive: {
-    color: '#fff',
+    // Styles handled inline
   },
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    backgroundColor: '#fff',
     padding: 16,
     borderRadius: 12,
     marginBottom: 16,
@@ -354,12 +348,10 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#4CAF50',
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
-    color: '#666',
     textTransform: 'uppercase',
   },
   listContent: {
@@ -372,36 +364,30 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#666',
     marginTop: 16,
     marginBottom: 8,
   },
   emptyText: {
     textAlign: 'center',
-    color: '#888',
     lineHeight: 20,
     marginBottom: 16,
   },
   browseButton: {
-    backgroundColor: '#4CAF50',
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
   },
   browseButtonText: {
-    color: '#fff',
     fontWeight: '600',
   },
   errorContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFE5E5',
     padding: 12,
     borderRadius: 8,
     marginBottom: 16,
   },
   errorText: {
-    color: '#D32F2F',
     marginLeft: 8,
     flex: 1,
   },

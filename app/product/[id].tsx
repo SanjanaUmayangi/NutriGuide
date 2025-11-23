@@ -8,13 +8,14 @@ import {
   Animated, 
   TouchableOpacity 
 } from 'react-native';
-import { useLocalSearchParams, useRouter, useNavigation } from 'expo-router'; // 🆕 ADD useRouter
+import { useLocalSearchParams, useRouter, useNavigation } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchNutrition } from '../../lib/api/nutritionApi';
 import { FoodItem } from '../../types/food';
 import { addFavourite, removeFavourite } from '../../lib/redux/slices/favouriteSlice';
 import { addToTracker } from '../../lib/redux/slices/calorieSlice';
 import { Feather } from '@expo/vector-icons';
+import useTheme from '../../hooks/useTheme'; // 🆕 Import theme hook
 
 export default function ProductPage() {
   const { id } = useLocalSearchParams();
@@ -24,10 +25,11 @@ export default function ProductPage() {
   const [favouriteAdded, setFavouriteAdded] = useState(false);
   const [trackerAdded, setTrackerAdded] = useState(false);
   const dispatch = useDispatch();
-  const router = useRouter(); // 🆕 ADD ROUTER
+  const router = useRouter();
   const navigation = useNavigation();
   const favourites = useSelector((state: any) => state.favourites.items);
   const isFavourite = favourites.some((fav: FoodItem) => fav.name === food?.name);
+  const { theme } = useTheme(); // 🆕 Get theme
 
   // Animation values
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
@@ -89,14 +91,14 @@ export default function ProductPage() {
     if (navigation.canGoBack()) {
       router.back();
     } else {
-      router.push('/(tabs)'); // Fallback to home
+      router.push('/(tabs)');
     }
   };
 
   const NutritionRow = ({ label, value, unit = '' }: { label: string; value: any; unit?: string }) => (
     <View style={s.nutritionRow}>
-      <Text style={s.nutritionLabel}>{label}</Text>
-      <Text style={s.nutritionValue}>
+      <Text style={[s.nutritionLabel, { color: theme.textSecondary }]}>{label}</Text>
+      <Text style={[s.nutritionValue, { color: theme.text }]}>
         {value || value === 0 ? `${value}${unit}` : 'N/A'}
       </Text>
     </View>
@@ -104,10 +106,10 @@ export default function ProductPage() {
 
   if (loading) {
     return (
-      <View style={s.center}>
+      <View style={[s.center, { backgroundColor: theme.background }]}>
         <View style={s.loadingContainer}>
-          <Feather name="loader" size={32} color="#4CAF50" style={s.loadingIcon} />
-          <Text style={s.loadingText}>Loading nutrition data...</Text>
+          <Feather name="loader" size={32} color={theme.primary} style={s.loadingIcon} />
+          <Text style={[s.loadingText, { color: theme.text }]}>Loading nutrition data...</Text>
         </View>
       </View>
     );
@@ -115,17 +117,16 @@ export default function ProductPage() {
 
   if (!food) {
     return (
-      <View style={s.center}>
+      <View style={[s.center, { backgroundColor: theme.background }]}>
         <View style={s.errorContainer}>
-          <Feather name="alert-circle" size={48} color="#FF6B6B" />
-          <Text style={s.errorTitle}>Food Not Found</Text>
-          <Text style={s.errorText}>
+          <Feather name="alert-circle" size={48} color={theme.error} />
+          <Text style={[s.errorTitle, { color: theme.text }]}>Food Not Found</Text>
+          <Text style={[s.errorText, { color: theme.textSecondary }]}>
             Sorry, we can&apos;t find nutrition data for &quot;{name}&quot;
           </Text>
-          {/* 🆕 ADD BACK BUTTON TO ERROR STATE */}
-          <TouchableOpacity style={s.backButton} onPress={handleGoBack}>
-            <Feather name="arrow-left" size={20} color="#4CAF50" />
-            <Text style={s.backButtonText}>Go Back</Text>
+          <TouchableOpacity style={[s.backButton, { backgroundColor: theme.surface }]} onPress={handleGoBack}>
+            <Feather name="arrow-left" size={20} color={theme.primary} />
+            <Text style={[s.backButtonText, { color: theme.primary }]}>Go Back</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -133,13 +134,13 @@ export default function ProductPage() {
   }
 
   return (
-    <View style={s.screenContainer}>
-      {/* 🆕 BACK BUTTON - FLOATING */}
+    <View style={[s.screenContainer, { backgroundColor: theme.background }]}>
+      {/* BACK BUTTON - FLOATING */}
       <TouchableOpacity 
-        style={s.backButton}
+        style={[s.backButton, { backgroundColor: theme.surface }]}
         onPress={handleGoBack}
       >
-        <Feather name="arrow-left" size={24} color="#2D3748" />
+        <Feather name="arrow-left" size={24} color={theme.text} />
       </TouchableOpacity>
 
       <ScrollView 
@@ -156,14 +157,14 @@ export default function ProductPage() {
             }
           ]}
         >
-          <Text style={s.foodName}>{food.name}</Text>
+          <Text style={[s.foodName, { color: theme.text }]}>{food.name}</Text>
           
           <View style={s.imageContainer}>
             <Image
               source={ food?.image ? { uri: food.image } : require('../../assets/images/icon.png') }
               style={s.image}
             />
-            <View style={s.imageOverlay} />
+            <View style={[s.imageOverlay, { backgroundColor: 'rgba(0,0,0,0.03)' }]} />
           </View>
         </Animated.View>
 
@@ -171,6 +172,7 @@ export default function ProductPage() {
         <Animated.View 
           style={[
             s.statsCard,
+            { backgroundColor: theme.surface },
             {
               opacity: fadeAnim,
               transform: [{ translateY: slideAnim }]
@@ -178,23 +180,23 @@ export default function ProductPage() {
           ]}
         >
           <View style={s.statItem}>
-            <Text style={s.statValue}>{food.calories}</Text>
-            <Text style={s.statLabel}>Calories</Text>
+            <Text style={[s.statValue, { color: theme.primary }]}>{food.calories}</Text>
+            <Text style={[s.statLabel, { color: theme.textSecondary }]}>Calories</Text>
           </View>
-          <View style={s.statDivider} />
+          <View style={[s.statDivider, { backgroundColor: theme.border }]} />
           <View style={s.statItem}>
-            <Text style={s.statValue}>{food.protein}g</Text>
-            <Text style={s.statLabel}>Protein</Text>
+            <Text style={[s.statValue, { color: theme.primary }]}>{food.protein}g</Text>
+            <Text style={[s.statLabel, { color: theme.textSecondary }]}>Protein</Text>
           </View>
-          <View style={s.statDivider} />
+          <View style={[s.statDivider, { backgroundColor: theme.border }]} />
           <View style={s.statItem}>
-            <Text style={s.statValue}>{food.carbohydrates}g</Text>
-            <Text style={s.statLabel}>Carbs</Text>
+            <Text style={[s.statValue, { color: theme.primary }]}>{food.carbohydrates}g</Text>
+            <Text style={[s.statLabel, { color: theme.textSecondary }]}>Carbs</Text>
           </View>
-          <View style={s.statDivider} />
+          <View style={[s.statDivider, { backgroundColor: theme.border }]} />
           <View style={s.statItem}>
-            <Text style={s.statValue}>{food.fat}g</Text>
-            <Text style={s.statLabel}>Fat</Text>
+            <Text style={[s.statValue, { color: theme.primary }]}>{food.fat}g</Text>
+            <Text style={[s.statLabel, { color: theme.textSecondary }]}>Fat</Text>
           </View>
         </Animated.View>
 
@@ -202,6 +204,7 @@ export default function ProductPage() {
         <Animated.View 
           style={[
             s.nutritionCard,
+            { backgroundColor: theme.surface },
             {
               opacity: fadeAnim,
               transform: [{ translateY: slideAnim }]
@@ -209,8 +212,8 @@ export default function ProductPage() {
           ]}
         >
           <View style={s.sectionHeader}>
-            <Feather name="bar-chart-2" size={20} color="#4CAF50" />
-            <Text style={s.sectionTitle}>Nutrition Facts</Text>
+            <Feather name="bar-chart-2" size={20} color={theme.primary} />
+            <Text style={[s.sectionTitle, { color: theme.text }]}>Nutrition Facts</Text>
           </View>
 
           <View style={s.singleColumn}>
@@ -231,19 +234,19 @@ export default function ProductPage() {
         {/* Status Messages */}
         {favouriteAdded && (
           <Animated.View 
-            style={[s.statusMessage, s.successMessage]}
+            style={[s.statusMessage, s.successMessage, { backgroundColor: theme.success + '20', borderColor: theme.success + '40' }]}
           >
-            <Feather name="check-circle" size={18} color="#38A169" />
-            <Text style={s.statusText}>Added to Favorites!</Text>
+            <Feather name="check-circle" size={18} color={theme.success} />
+            <Text style={[s.statusText, { color: theme.success }]}>Added to Favorites!</Text>
           </Animated.View>
         )}
         
         {trackerAdded && (
           <Animated.View 
-            style={[s.statusMessage, s.successMessage]}
+            style={[s.statusMessage, s.successMessage, { backgroundColor: theme.success + '20', borderColor: theme.success + '40' }]}
           >
-            <Feather name="check-circle" size={18} color="#38A169" />
-            <Text style={s.statusText}>Added to Daily Tracker!</Text>
+            <Feather name="check-circle" size={18} color={theme.success} />
+            <Text style={[s.statusText, { color: theme.success }]}>Added to Daily Tracker!</Text>
           </Animated.View>
         )}
 
@@ -261,19 +264,23 @@ export default function ProductPage() {
           <TouchableOpacity 
             style={[
               s.iconButton,
-              isFavourite ? s.favouriteButtonActive : s.favouriteButton
+              isFavourite 
+                ? [s.favouriteButtonActive, { backgroundColor: theme.error, borderColor: theme.error }]
+                : [s.favouriteButton, { borderColor: theme.error }]
             ]}
             onPress={handleAddFavourite}
           >
             <Feather 
               name="heart" 
               size={22} 
-              color={isFavourite ? "#FFFFFF" : "#FF6B6B"} 
-              fill={isFavourite ? "#FFFFFF" : "none"}
+              color={isFavourite ? theme.textInverse : theme.error} 
+              fill={isFavourite ? theme.textInverse : "none"}
             />
             <Text style={[
               s.iconButtonText,
-              isFavourite && s.iconButtonTextActive
+              isFavourite 
+                ? [s.iconButtonTextActive, { color: theme.textInverse }]
+                : { color: theme.error }
             ]}>
               {isFavourite ? 'Favourited' : 'Add to Favourites'}
             </Text>
@@ -283,7 +290,9 @@ export default function ProductPage() {
           <TouchableOpacity 
             style={[
               s.iconButton,
-              trackerAdded ? s.trackerButtonActive : s.trackerButton
+              trackerAdded 
+                ? [s.trackerButtonActive, { backgroundColor: theme.primary, borderColor: theme.primary }]
+                : [s.trackerButton, { borderColor: theme.primary }]
             ]}
             onPress={handleAddToTracker}
             disabled={trackerAdded}
@@ -291,11 +300,13 @@ export default function ProductPage() {
             <Feather 
               name={trackerAdded ? "check-circle" : "plus-circle"} 
               size={22} 
-              color={trackerAdded ? "#FFFFFF" : "#4CAF50"} 
+              color={trackerAdded ? theme.textInverse : theme.primary} 
             />
             <Text style={[
               s.iconButtonText,
-              trackerAdded && s.iconButtonTextActive
+              trackerAdded 
+                ? [s.iconButtonTextActive, { color: theme.textInverse }]
+                : { color: theme.primary }
             ]}>
               {trackerAdded ? 'Added to Tracker' : 'Add to Tracker'}
             </Text>
@@ -309,19 +320,16 @@ export default function ProductPage() {
 const s = StyleSheet.create({
   screenContainer: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
   },
   container: { 
     padding: 20,
-    paddingTop: 70, // 🆕 ADD PADDING FOR BACK BUTTON
+    paddingTop: 70,
   },
   center: { 
     flex: 1, 
     justifyContent: 'center', 
     alignItems: 'center',
-    backgroundColor: '#F8FAFC',
   },
-  // 🆕 BACK BUTTON STYLES
   backButton: {
     position: 'absolute',
     top: 50,
@@ -330,7 +338,6 @@ const s = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -339,10 +346,8 @@ const s = StyleSheet.create({
     shadowRadius: 12,
     elevation: 4,
     borderWidth: 1,
-    borderColor: '#F1F5F9',
   },
   backButtonText: {
-    color: '#4CAF50',
     fontWeight: '600',
     marginLeft: 8,
   },
@@ -354,7 +359,6 @@ const s = StyleSheet.create({
   },
   loadingText: {
     fontSize: 16,
-    color: '#666',
     fontWeight: '500',
   },
   errorContainer: {
@@ -364,13 +368,11 @@ const s = StyleSheet.create({
   errorTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#2D3748',
     marginTop: 16,
     marginBottom: 8,
   },
   errorText: {
     fontSize: 16,
-    color: '#718096',
     textAlign: 'center',
     lineHeight: 24,
     marginBottom: 20,
@@ -384,7 +386,6 @@ const s = StyleSheet.create({
     fontWeight: '800', 
     marginBottom: 20, 
     textAlign: 'center',
-    color: '#1A1A1A',
     lineHeight: 34,
   },
   imageContainer: {
@@ -405,11 +406,9 @@ const s = StyleSheet.create({
   },
   imageOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.03)',
   },
   statsCard: {
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
     padding: 20,
     borderRadius: 16,
     marginBottom: 20,
@@ -427,22 +426,18 @@ const s = StyleSheet.create({
   statValue: {
     fontSize: 20,
     fontWeight: '800',
-    color: '#4CAF50',
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
-    color: '#718096',
     fontWeight: '600',
     textTransform: 'uppercase',
   },
   statDivider: {
     width: 1,
     height: 40,
-    backgroundColor: '#E2E8F0',
   },
   nutritionCard: { 
-    backgroundColor: '#FFFFFF', 
     padding: 24, 
     borderRadius: 16, 
     marginBottom: 20,
@@ -461,7 +456,6 @@ const s = StyleSheet.create({
     fontSize: 20, 
     fontWeight: '700', 
     marginLeft: 8,
-    color: '#1A1A1A',
   },
   singleColumn: {
     // Single column layout
@@ -472,17 +466,14 @@ const s = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#F7FAFC',
   },
   nutritionLabel: {
     fontSize: 14,
-    color: '#718096',
     fontWeight: '500',
     flex: 1,
   },
   nutritionValue: { 
     fontWeight: '700',
-    color: '#2D3748',
     fontSize: 14,
   },
   actions: { 
@@ -498,16 +489,13 @@ const s = StyleSheet.create({
     borderWidth: 1,
   },
   successMessage: {
-    backgroundColor: '#F0FFF4',
-    borderColor: '#9AE6B4',
+    // Styles handled inline
   },
   statusText: {
-    color: '#276749',
     fontWeight: '600',
     marginLeft: 8,
     fontSize: 14,
   },
-  // Modern Icon Buttons Styles
   iconButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -524,27 +512,22 @@ const s = StyleSheet.create({
   },
   favouriteButton: {
     backgroundColor: 'transparent',
-    borderColor: '#FF6B6B',
   },
   favouriteButtonActive: {
-    backgroundColor: '#FF6B6B',
-    borderColor: '#FF6B6B',
+    // Styles handled inline
   },
   trackerButton: {
     backgroundColor: 'transparent',
-    borderColor: '#4CAF50',
   },
   trackerButtonActive: {
-    backgroundColor: '#4CAF50',
-    borderColor: '#4CAF50',
+    // Styles handled inline
   },
   iconButtonText: {
     fontSize: 16,
     fontWeight: '700',
     marginLeft: 8,
-    color: '#2D3748',
   },
   iconButtonTextActive: {
-    color: '#FFFFFF',
+    // Styles handled inline
   },
 });

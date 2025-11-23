@@ -4,6 +4,7 @@ import { FoodItem } from '../types/food';
 import { useAppDispatch, useAppSelector } from '../lib/redux/hooks';
 import { addFavourite, removeFavourite } from '../lib/redux/slices/favouriteSlice';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import useTheme from '../hooks/useTheme'; // 🆕 Import theme hook
 
 interface FoodCardProps {
   item: FoodItem;
@@ -11,12 +12,11 @@ interface FoodCardProps {
   showFavouriteButton?: boolean;
 }
 
-// components/FoodCard.tsx
 export default function FoodCard({ item, onPress }: FoodCardProps) {
-    const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
   const favourites = useAppSelector(state => state.favourites.items);
+  const { theme } = useTheme(); // 🆕 Get theme
   
-  // Check if current item is in favourites
   const isFavourite = favourites.some(fav => fav.name === item.name);
 
   const handleFavouritePress = () => {
@@ -28,7 +28,10 @@ export default function FoodCard({ item, onPress }: FoodCardProps) {
   };
 
   return (
-    <TouchableOpacity style={s.card} onPress={() => onPress(item)}>
+    <TouchableOpacity 
+      style={[s.card, { backgroundColor: theme.surface }]} 
+      onPress={() => onPress(item)}
+    >
       <Image
         source={ 
           item.image 
@@ -39,37 +42,46 @@ export default function FoodCard({ item, onPress }: FoodCardProps) {
         defaultSource={require('../assets/images/icon.png')}
       />
       <View style={s.info}>
-        <Text style={s.name}>{item.name}</Text>
-        <Text style={s.calories}>
+        <Text style={[s.name, { color: theme.text }]}>{item.name}</Text>
+        <Text style={[s.calories, { color: theme.textSecondary }]}>
           {item.calories > 0 ? `${item.calories} kcal` : 'Calories unknown'}
         </Text>
         <View style={s.macros}>
-          <Text style={s.macro}>P: {item.protein > 0 ? `${item.protein}g` : '?'}</Text>
-          <Text style={s.macro}>C: {item.carbohydrates > 0 ? `${item.carbohydrates}g` : '?'}</Text>
-          <Text style={s.macro}>F: {item.fat > 0 ? `${item.fat}g` : '?'}</Text>
+          <Text style={[s.macro, { color: theme.textSecondary }]}>
+            P: {item.protein > 0 ? `${item.protein}g` : '?'}
+          </Text>
+          <Text style={[s.macro, { color: theme.textSecondary }]}>
+            C: {item.carbohydrates > 0 ? `${item.carbohydrates}g` : '?'}
+          </Text>
+          <Text style={[s.macro, { color: theme.textSecondary }]}>
+            F: {item.fat > 0 ? `${item.fat}g` : '?'}
+          </Text>
         </View>
       </View>
 
-{/* Favourite Heart Icon */}
+      {/* Favourite Heart Icon */}
       <TouchableOpacity 
-        style={[s.heartButton, isFavourite && s.heartButtonActive]}
+        style={[
+          s.heartButton, 
+          { backgroundColor: theme.background + 'CC' },
+          isFavourite && [s.heartButtonActive, { backgroundColor: theme.error + '20' }]
+        ]}
         onPress={handleFavouritePress}
         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
       >
         <Icon 
           name={isFavourite ? "heart" : "heart-o"} 
           size={16} 
-          color={isFavourite ? "#ff4444" : "#999"} 
+          color={isFavourite ? theme.error : theme.textSecondary} 
         />
       </TouchableOpacity>
-
     </TouchableOpacity>
   );
 }
+
 const s = StyleSheet.create({
   card: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
     padding: 12,
     borderRadius: 12,
     marginBottom: 10,
@@ -97,7 +109,6 @@ const s = StyleSheet.create({
   },
   calories: {
     fontSize: 14,
-    color: '#666',
     marginBottom: 4,
   },
   macros: {
@@ -105,10 +116,8 @@ const s = StyleSheet.create({
   },
   macro: {
     fontSize: 12,
-    color: '#888',
     marginRight: 8,
   },
-  // Heart button styles
   heartButton: {
     position: 'absolute',
     top: 12,
@@ -116,20 +125,12 @@ const s = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'rgba(255, 0, 0, 0.2)',
   },
   heartButtonActive: {
-    backgroundColor: 'rgba(255, 0, 0, 0.1)',
     borderColor: 'rgba(255, 0, 0, 0.3)',
-  },
-  heartIcon: {
-    fontSize: 16,
-  },
-  heartIconActive: {
-    fontSize: 16,
   },
 });

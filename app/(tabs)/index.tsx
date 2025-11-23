@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TextInput } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../lib/redux/hooks';
 import { fetchFoods } from '../../lib/redux/slices/foodSlice';
 import FoodCard from '../../components/FoodCard';
 import { useRouter } from 'expo-router';
 import Button from '../../components/ui/Button';
-import { FoodItem } from '../../types/food'; // 🆕 Import FoodItem type
+import { FoodItem } from '../../types/food'; //Import FoodItem type
+import useTheme from '../../hooks/useTheme';
+import { Feather } from '@expo/vector-icons';
 
 export default function Home() {
   const [query, setQuery] = useState('');
@@ -14,6 +16,7 @@ export default function Home() {
   const dispatch = useAppDispatch();
   const { items: defaultFoods, loading } = useAppSelector(state => state.foods);
   const router = useRouter();
+  const {theme} = useTheme();
 
   // Fetch default foods on first render
   useEffect(() => {
@@ -78,14 +81,19 @@ export default function Home() {
   };
 
   return (
-    <View style={s.container}>
-      <Text style={s.title}>NutriGuide+</Text>
+    <View style={[s.container, { backgroundColor: theme.background }]}>
+      <Text style={[s.title, { color: theme.text }]}>NutriGuide+</Text>
       
       {/* Search Container */}
-      <View style={s.searchContainer}>
+      {/* <View style={[s.searchContainer, { backgroundColor: theme.surface }]}>
         <TextInput
-          style={s.searchInput}
+          style={[s.searchInput, { 
+            backgroundColor: theme.inputBackground, 
+            borderColor: theme.inputBorder,
+            color: theme.inputText 
+          }]}
           placeholder="Search for food..."
+          placeholderTextColor={theme.inputPlaceholder}
           value={query}
           onChangeText={handleQueryChange}
           onSubmitEditing={handleSearch}
@@ -107,11 +115,64 @@ export default function Home() {
             disabled={!query.trim()}
           />
         </View>
+      </View> */}
+            <View style={[s.searchContainer, { backgroundColor: theme.surface }]}>
+        {/* Search Icon */}
+        <Feather 
+          name="search" 
+          size={20} 
+          color={theme.textSecondary} 
+          style={s.searchIcon}
+        />
+        
+        <TextInput
+          style={[s.searchInput, { 
+            backgroundColor: theme.inputBackground, 
+            borderColor: theme.inputBorder,
+            color: theme.inputText 
+          }]}
+          placeholder="Search for food..."
+          placeholderTextColor={theme.inputPlaceholder}
+          value={query}
+          onChangeText={handleQueryChange}
+          onSubmitEditing={handleSearch}
+          returnKeyType="search"
+        />
+        
+        {/* Clear Button (X icon) - appears only when there's text */}
+        {query ? (
+          <TouchableOpacity 
+            style={s.clearIconButton}
+            onPress={handleClearSearch}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Feather name="x" size={18} color={theme.textSecondary} />
+          </TouchableOpacity>
+        ) : null}
+        
+        {/* Enhanced Search Button */}
+        <TouchableOpacity 
+          style={[
+            s.searchIconButton,
+            { 
+              backgroundColor: query.trim() ? theme.primary : theme.border,
+              opacity: query.trim() ? 1 : 0.6
+            }
+          ]}
+          onPress={handleSearch}
+          disabled={!query.trim()}
+        >
+          <Feather 
+            name="search" 
+            size={18} 
+            color={query.trim() ? theme.textInverse : theme.textSecondary} 
+          />
+        </TouchableOpacity>
       </View>
 
       {/* Search Status */}
       {isSearching && (
-        <Text style={s.searchStatus}>
+        <Text style={[s.searchStatus, { color: theme.textSecondary }]}>
           {loading 
             ? `Searching for "${query}"...` 
             : `Found ${displayFoods.length} result${displayFoods.length !== 1 ? 's' : ''} for "${query}"`
@@ -173,22 +234,37 @@ const s = StyleSheet.create({
     fontWeight: '700', 
     marginBottom: 20, 
     textAlign: 'center',
-    color: '#1A1A1A',
+    // color: '#1A1A1A',
   },
   searchContainer: { 
     flexDirection: 'row', 
     marginBottom: 16,
     alignItems: 'center',
   },
-  searchInput: { 
-    flex: 1, 
-    backgroundColor: '#fff', 
-    padding: 12, 
-    borderRadius: 10, 
+searchIcon: {
     marginRight: 8,
-    borderWidth: 1,
-    borderColor: '#ddd',
+  },
+  searchInput: { 
+    flex: 1,
+    padding: 8,
+    borderRadius: 8,
     fontSize: 16,
+    borderWidth: 1,
+  },
+  clearIconButton: {
+    padding: 6,
+    marginHorizontal: 4,
+    borderRadius: 20,
+  },
+  searchIconButton: {
+    padding: 10,
+    borderRadius: 10,
+    marginLeft: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
   searchButtons: {
     flexDirection: 'row',
@@ -202,7 +278,7 @@ const s = StyleSheet.create({
   },
   searchStatus: {
     fontSize: 14,
-    color: '#666',
+    //color: '#666',
     marginBottom: 12,
     fontStyle: 'italic',
   },
@@ -212,7 +288,7 @@ const s = StyleSheet.create({
   },
   emptyText: { 
     textAlign: 'center', 
-    color: '#666', 
+    //color: '#666', 
     marginBottom: 16,
     fontSize: 16,
   },

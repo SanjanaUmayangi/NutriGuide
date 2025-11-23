@@ -11,6 +11,7 @@ import { Feather } from '@expo/vector-icons';
 import { useAppDispatch, useAppSelector } from '../lib/redux/hooks';
 import { toggleBookmark } from '../lib/redux/slices/tipsSlice';
 import { Tip } from '../types/api';
+import useTheme from '../hooks/useTheme'; // 🆕 Import theme hook
 
 interface TipCardProps {
   tip: Tip;
@@ -21,6 +22,7 @@ interface TipCardProps {
 export default function TipCard({ tip, onPress, variant = 'default' }: TipCardProps) {
   const dispatch = useAppDispatch();
   const bookmarkedTips = useAppSelector(state => state.tips.bookmarkedTips);
+  const { theme } = useTheme(); // 🆕 Get theme
   
   const isBookmarked = bookmarkedTips.includes(tip.id);
 
@@ -56,7 +58,7 @@ export default function TipCard({ tip, onPress, variant = 'default' }: TipCardPr
       'Mental Health': '#E91E63',
       'Digestive Health': '#795548',
     };
-    return colors[category] || '#666';
+    return colors[category] || theme.primary;
   };
 
   const getDifficultyColor = (difficulty?: string) => {
@@ -65,14 +67,15 @@ export default function TipCard({ tip, onPress, variant = 'default' }: TipCardPr
       'intermediate': '#FF9800',
       'advanced': '#F44336',
     };
-    return colors[difficulty || 'beginner'] || '#666';
+    return colors[difficulty || 'beginner'] || theme.textSecondary;
   };
 
   return (
     <TouchableOpacity 
       style={[
         styles.card,
-        variant === 'featured' && styles.featuredCard
+        { backgroundColor: theme.surface },
+        variant === 'featured' && [styles.featuredCard, { borderLeftColor: theme.primary }]
       ]}
       onPress={() => onPress?.(tip)}
       activeOpacity={0.7}
@@ -103,19 +106,19 @@ export default function TipCard({ tip, onPress, variant = 'default' }: TipCardPr
       </View>
 
       {/* Title */}
-      <Text style={styles.title} numberOfLines={2}>
+      <Text style={[styles.title, { color: theme.text }]} numberOfLines={2}>
         {tip.title}
       </Text>
 
       {/* Description */}
       {tip.description && (
-        <Text style={styles.description} numberOfLines={2}>
+        <Text style={[styles.description, { color: theme.textSecondary }]} numberOfLines={2}>
           {tip.description}
         </Text>
       )}
 
       {/* Content Preview */}
-      <Text style={styles.content} numberOfLines={3}>
+      <Text style={[styles.content, { color: theme.text }]} numberOfLines={3}>
         {tip.content}
       </Text>
 
@@ -124,15 +127,15 @@ export default function TipCard({ tip, onPress, variant = 'default' }: TipCardPr
         <View style={styles.metaInfo}>
           {tip.readTime && (
             <View style={styles.metaItem}>
-              <Feather name="clock" size={12} color="#666" />
-              <Text style={styles.metaText}>{tip.readTime} min read</Text>
+              <Feather name="clock" size={12} color={theme.textSecondary} />
+              <Text style={[styles.metaText, { color: theme.textSecondary }]}>{tip.readTime} min read</Text>
             </View>
           )}
           
           {tip.source && (
             <View style={styles.metaItem}>
-              <Feather name="book" size={12} color="#666" />
-              <Text style={styles.metaText}>{tip.source}</Text>
+              <Feather name="book" size={12} color={theme.textSecondary} />
+              <Text style={[styles.metaText, { color: theme.textSecondary }]}>{tip.source}</Text>
             </View>
           )}
         </View>
@@ -142,7 +145,7 @@ export default function TipCard({ tip, onPress, variant = 'default' }: TipCardPr
             onPress={handleShare}
             style={styles.actionButton}
           >
-            <Feather name="share-2" size={16} color="#666" />
+            <Feather name="share-2" size={16} color={theme.textSecondary} />
           </TouchableOpacity>
           
           <TouchableOpacity 
@@ -152,8 +155,8 @@ export default function TipCard({ tip, onPress, variant = 'default' }: TipCardPr
             <Feather 
               name="bookmark" 
               size={16} 
-              color={isBookmarked ? "#4CAF50" : "#666"} 
-              fill={isBookmarked ? "#4CAF50" : "transparent"}
+              color={isBookmarked ? theme.primary : theme.textSecondary} 
+              fill={isBookmarked ? theme.primary : "transparent"}
             />
           </TouchableOpacity>
         </View>
@@ -164,7 +167,6 @@ export default function TipCard({ tip, onPress, variant = 'default' }: TipCardPr
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#fff',
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
@@ -176,7 +178,6 @@ const styles = StyleSheet.create({
   },
   featuredCard: {
     borderLeftWidth: 4,
-    borderLeftColor: '#4CAF50',
   },
   header: {
     flexDirection: 'row',
@@ -209,19 +210,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     marginBottom: 8,
-    color: '#1E1E1E',
     lineHeight: 20,
   },
   description: {
     fontSize: 14,
-    color: '#666',
     marginBottom: 8,
     fontStyle: 'italic',
     lineHeight: 18,
   },
   content: {
     fontSize: 14,
-    color: '#555',
     lineHeight: 20,
     marginBottom: 16,
   },
@@ -242,7 +240,6 @@ const styles = StyleSheet.create({
   },
   metaText: {
     fontSize: 11,
-    color: '#666',
     marginLeft: 4,
   },
   actions: {
