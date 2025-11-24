@@ -4,19 +4,19 @@ import { API_NINJAS_KEY } from "../../constants/config";
 import { FoodItem } from "../../types/food";
 import { fetchFoodImage } from "./imageApi";
 
-function mapApiToFoodItem(api: any, image?: string): FoodItem {
-  return {
-    id: Math.random().toString(36).substring(2, 12),
-    name: api.name,
-    brand: "",
-    calories: api.calories,
-    sugar: 0,
-    fat: api.fat_total_g,
-    protein: api.protein_g,
-    carbohydrates: api.carbohydrates_total_g,
-    image, // assign Pixabay image
-  };
-}
+// function mapApiToFoodItem(api: any, image?: string): FoodItem {
+//   return {
+//     id: Math.random().toString(36).substring(2, 12),
+//     name: api.name,
+//     brand: "",
+//     calories: api.calories,
+//     sugar: 0,
+//     fat: api.fat_total_g,
+//     protein: api.protein_g,
+//     carbohydrates: api.carbohydrates_total_g,
+//     image, // assign Pixabay image
+//   };
+// }
 
 export async function fetchNutrition(query: string): Promise<FoodItem[]> {
   try {

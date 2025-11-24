@@ -22,7 +22,7 @@ export default function Home() {
   useEffect(() => {
     const defaultFoods = ['apple', 'banana', 'chicken breast', 'pasta', 'yogurt', 'bread', 'cheese', 'orange'];
     defaultFoods.forEach(food => dispatch(fetchFoods(food)));
-  }, []);
+  }, [dispatch]);
 
   // Determine which foods to display
   const displayFoods = isSearching ? searchResults : defaultFoods;

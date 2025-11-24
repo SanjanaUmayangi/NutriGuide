@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { setItem, getItem } from '../../utils/storage';
+import { setItem } from '../../utils/storage';
 
 interface ThemeState {
   current: 'light' | 'dark';

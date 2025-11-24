@@ -1,4 +1,4 @@
-import { Tip, TipsResponse } from '../../types/api';
+import { Tip } from '../../types/api';
 
 const MOCK_TIPS: Tip[] = [
   {

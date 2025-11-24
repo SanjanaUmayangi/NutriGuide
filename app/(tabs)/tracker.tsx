@@ -87,7 +87,7 @@ export default function Tracker() {
       {/* Daily Summary Card */}
       <View style={[styles.summaryCard, { backgroundColor: theme.surface }]}>
         <View style={styles.summaryHeader}>
-          <Text style={[styles.summaryTitle, { color: theme.text }]}>Summary</Text>
+          <Text style={[styles.summaryTitle, { color: theme.text }]}>Today&apos;s Summary</Text>
           <TouchableOpacity onPress={() => setEditingGoal(!editingGoal)}>
             <Feather name="edit-2" size={16} color={theme.textSecondary} />
           </TouchableOpacity>

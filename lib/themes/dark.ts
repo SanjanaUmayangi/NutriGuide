@@ -49,4 +49,4 @@ export default {
   inputBorder: '#404040',
   inputText: '#FFFFFF',
   inputPlaceholder: '#808080',
-};
+};    

@@ -32,7 +32,7 @@ export default function TipCard({ tip, onPress, variant = 'default' }: TipCardPr
         tipId: tip.id,
         bookmarked: !isBookmarked
       })).unwrap();
-    } catch (error) {
+    } catch  {
       Alert.alert('Error', 'Failed to bookmark tip');
     }
   };

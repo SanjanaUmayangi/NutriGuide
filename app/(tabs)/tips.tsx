@@ -45,7 +45,7 @@ export default function Tips() {
   useEffect(() => {
     dispatch(fetchTips());
     dispatch(fetchCategories());
-  }, []);
+  }, [dispatch]);
 
   // Handle category change
   const handleCategoryChange = (category: string) => {
